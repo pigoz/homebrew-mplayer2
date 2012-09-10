@@ -11,7 +11,7 @@ Usage
  *  `brew install --HEAD pigoz/mplayer2/libav`: since brew will error out on
     mplayer2's installation because libav is a head only formula. Just
     install it manually.
- *  `brew install --HEAD pigoz/mplayer2/mplayer2`
+ *  `brew install --HEAD pigoz/mplayer2/mplayer2 --with-libav`
 
 To update the tapped formulae from this repository use `brew update`.
 

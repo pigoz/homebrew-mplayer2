@@ -4,6 +4,27 @@ def libav?
   build.include? 'with-libav'
 end
 
+class DocutilsInstalled < Requirement
+  def message; <<-EOS.undent
+    Docutils is required to install.
+
+    You can install this with:
+      sudo easy_install docutils
+
+    You also need to symlink rst2man to some place in your path. For example:
+    sudo ln -nfs /usr/local/bin/rst2man.py /usr/local/bin/rst2man
+    EOS
+  end
+
+  def satisfied?
+    which('rst2man')
+  end
+
+  def fatal?
+    true
+  end
+end
+
 class Mplayer2 < Formula
   head 'git://git.mplayer2.org/mplayer2.git', :using => :git,
     :branch => 'unstable'
@@ -13,6 +34,7 @@ class Mplayer2 < Formula
   depends_on :x11
   depends_on 'pkg-config' => :build
   depends_on 'python3' => :build
+  depends_on DocutilsInstalled.new => :build
 
   depends_on 'libbs2b'
   depends_on 'libass'

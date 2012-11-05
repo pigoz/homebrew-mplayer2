@@ -48,6 +48,8 @@ class Mplayer2 < Formula
     depends_on 'ffmpeg'
   end
 
+  env :std # looks like :superenv doesn't pick up Docutils path
+
   unless libav?
     def caveats; <<-EOS.undent
       mplayer2 is designed to work best with HEAD versions of ffmpeg/libav.

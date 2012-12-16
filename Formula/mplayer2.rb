@@ -17,7 +17,7 @@ class DocutilsInstalled < Requirement
   end
 
   def satisfied?
-    which('rst2man')
+    which('rst2man') || which('rst2man.py')
   end
 
   def fatal?

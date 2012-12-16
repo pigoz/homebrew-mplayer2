@@ -29,7 +29,6 @@ class Mplayer2 < Formula
   head 'git://git.mplayer2.org/mplayer2.git', :using => :git
   homepage 'http://mplayer2.org'
 
-  depends_on :x11
   depends_on 'pkg-config' => :build
   depends_on 'python3' => :build
   depends_on DocutilsInstalled.new => :build

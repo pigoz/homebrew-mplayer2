@@ -5,6 +5,9 @@ def libav?
 end
 
 class DocutilsInstalled < Requirement
+  fatal true
+  env :userpaths
+
   def message; <<-EOS.undent
     Docutils is required to install.
 
@@ -18,10 +21,6 @@ class DocutilsInstalled < Requirement
 
   def satisfied?
     which('rst2man') || which('rst2man.py')
-  end
-
-  def fatal?
-    true
   end
 end
 
@@ -44,8 +43,6 @@ class Mplayer2 < Formula
   else
     depends_on 'ffmpeg'
   end
-
-  env :std # looks like :superenv doesn't pick up Docutils path
 
   unless libav?
     def caveats; <<-EOS.undent

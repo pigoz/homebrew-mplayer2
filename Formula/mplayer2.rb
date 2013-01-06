@@ -24,6 +24,26 @@ class DocutilsInstalled < Requirement
   end
 end
 
+class GitVersionWriter
+  def initialize(downloader)
+    @downloader = downloader
+  end
+
+  def write
+    ohai "Generating VERSION file from Homebrew's git cache"
+    File.open('VERSION', 'w') {|f| f.write(git_revision) }
+  end
+
+  private
+  def git_revision
+    `cd #{git_cache} && git describe --match "v[0-9]*" --always`.strip
+  end
+
+  def git_cache
+    @downloader.cached_location
+  end
+end
+
 class Mplayer2 < Formula
   head 'git://git.mplayer2.org/mplayer2.git', :using => :git
   homepage 'http://mplayer2.org'
@@ -63,7 +83,7 @@ class Mplayer2 < Formula
             "--enable-macosx-finder",
             "--enable-apple-remote"]
 
-    generate_version
+    GitVersionWriter.new(@downloader).write
     system "./configure", *args
     system "make install"
 
@@ -72,19 +92,6 @@ class Mplayer2 < Formula
   end
 
   private
-  def generate_version
-    ohai "Generating VERSION from the Homebrew's git cache"
-    File.open('VERSION', 'w') {|f| f.write(git_revision) }
-  end
-
-  def git_revision
-    `cd #{git_cache} && git describe --match "v[0-9]*" --always`.strip
-  end
-
-  def git_cache
-    @downloader.cached_location
-  end
-
   def binary_name
     'mplayer2'
   end

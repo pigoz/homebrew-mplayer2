@@ -4,6 +4,10 @@ def libav?
   build.include? 'with-libav'
 end
 
+def bundle?
+  not build.include? 'without-bundle'
+end
+
 class DocutilsInstalled < Requirement
   fatal true
   env :userpaths
@@ -65,24 +69,26 @@ class Mplayer2 < Formula
     depends_on 'ffmpeg'
   end
 
-  unless libav?
-    def caveats; <<-EOS.undent
+  def caveats
+    cvts = <<-EOS.undent
       mplayer2 is designed to work best with HEAD versions of ffmpeg/libav.
       If you are noticing problems please try to install the HEAD version of
       ffmpeg with: `brew install --HEAD ffmpeg`
-      EOS
-    end
+    EOS
+    cvts << bundle_caveats if bundle?
+    cvts
   end
 
-  option 'with-libav', 'Build against libav instead of ffmpeg.'
+  option 'with-libav',     'Build against libav instead of ffmpeg.'
+  option 'without-bundle', 'Do not create a Mac OSX Application Bundle.'
 
   def install
     ENV.O1 if ENV.compiler == :llvm
     args = ["--prefix=#{prefix}",
-            "--cc=#{ENV.cc}",
-            "--enable-macosx-bundle",
-            "--enable-macosx-finder",
-            "--enable-apple-remote"]
+            "--cc=#{ENV.cc}"]
+
+    args << "--enable-macosx-bundle" if bundle?
+    args << "--enable-macosx-finder" if bundle?
 
     GitVersionWriter.new(@downloader).write
     system "./configure", *args
@@ -90,10 +96,27 @@ class Mplayer2 < Formula
 
     mv bin/'mplayer', bin/binary_name
     mv man1/'mplayer.1', man1/(binary_name + '.1')
+
+    if bundle?
+      system "make osxbundle"
+      prefix.install "#{binary_name}.app"
+    end
   end
 
   private
   def binary_name
     'mplayer2'
+  end
+
+  def bundle_caveats; <<-EOS.undent
+
+      #{binary_name}.app installed to:
+        #{prefix}
+
+      To link the application to a normal Mac OS X location:
+          brew linkapps
+      or:
+          ln -s #{prefix}/#{binary_name}.app /Applications
+      EOS
   end
 end
